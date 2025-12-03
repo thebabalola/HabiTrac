@@ -12,13 +12,29 @@ import { Challenge } from '@/types/challenge';
 export default function ChallengesPage() {
   const { isConnected } = useAccount();
   const router = useRouter();
-  const [challenges] = useState<Challenge[]>(mockChallenges);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     if (!isConnected) {
       router.push('/');
     }
   }, [isConnected, router]);
+
+  useEffect(() => {
+    // Simulate loading challenges
+    const loadChallenges = async () => {
+      setIsLoading(true);
+      // Simulate API call delay
+      await new Promise(resolve => setTimeout(resolve, 500));
+      setChallenges(mockChallenges);
+      setIsLoading(false);
+    };
+    
+    if (isConnected) {
+      loadChallenges();
+    }
+  }, [isConnected]);
 
   if (!isConnected) {
     return null;
@@ -68,16 +84,32 @@ export default function ChallengesPage() {
           Community Challenges
         </h1>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {challenges.map((challenge) => (
-            <ChallengeCard
-              key={challenge.id}
-              challenge={challenge}
-              onJoin={handleJoinChallenge}
-              isJoined={joinedChallenges.has(challenge.id)}
-            />
-          ))}
-        </div>
+        {isLoading ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+            <p className="mt-4 text-gray-600 dark:text-gray-300">Loading challenges...</p>
+          </div>
+        ) : challenges.length === 0 ? (
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+            <p className="text-gray-600 dark:text-gray-300 mb-4">
+              No challenges available at the moment.
+            </p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Check back later for new community challenges!
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {challenges.map((challenge) => (
+              <ChallengeCard
+                key={challenge.id}
+                challenge={challenge}
+                onJoin={handleJoinChallenge}
+                isJoined={joinedChallenges.has(challenge.id)}
+              />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   );
