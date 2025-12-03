@@ -64,9 +64,21 @@ contract HabiTrac is Ownable {
 
     function logHabit(uint256 _habitId, uint256 _timestamp) public {
         require(_habitId < habitCounter, "Habit does not exist");
-        require(userHabits[msg.sender].length > _habitId, "Habit not found");
-        require(userHabits[msg.sender][_habitId].isActive, "Habit is not active");
-        require(userHabits[msg.sender][_habitId].owner == msg.sender, "Not the habit owner");
+        require(habitOwners[_habitId] == msg.sender, "Not the habit owner");
+        
+        // Find the habit in user's habits array
+        Habit[] storage habits = userHabits[msg.sender];
+        bool found = false;
+        uint256 habitIndex = 0;
+        for (uint256 i = 0; i < habits.length; i++) {
+            if (habits[i].id == _habitId) {
+                found = true;
+                habitIndex = i;
+                break;
+            }
+        }
+        require(found, "Habit not found");
+        require(habits[habitIndex].isActive, "Habit is not active");
 
         // Check if already logged for this day
         uint256 dayStart = (_timestamp / 86400) * 86400; // Start of day in seconds
@@ -124,10 +136,18 @@ contract HabiTrac is Ownable {
     }
 
     function deleteHabit(uint256 _habitId) public {
-        require(_habitId < userHabits[msg.sender].length, "Habit not found");
-        require(userHabits[msg.sender][_habitId].owner == msg.sender, "Not the habit owner");
+        require(_habitId < habitCounter, "Habit does not exist");
+        require(habitOwners[_habitId] == msg.sender, "Not the habit owner");
         
-        userHabits[msg.sender][_habitId].isActive = false;
+        // Find and deactivate the habit
+        Habit[] storage habits = userHabits[msg.sender];
+        for (uint256 i = 0; i < habits.length; i++) {
+            if (habits[i].id == _habitId) {
+                habits[i].isActive = false;
+                break;
+            }
+        }
+        
         emit HabitDeleted(msg.sender, _habitId);
     }
 
