@@ -14,6 +14,7 @@ export default function ChallengesPage() {
   const router = useRouter();
   const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [joinedChallenges, setJoinedChallenges] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!isConnected) {
@@ -35,12 +36,6 @@ export default function ChallengesPage() {
       loadChallenges();
     }
   }, [isConnected]);
-
-  if (!isConnected) {
-    return null;
-  }
-
-  const [joinedChallenges, setJoinedChallenges] = useState<Set<string>>(new Set());
 
   const handleJoinChallenge = (challengeId: string) => {
     if (joinedChallenges.has(challengeId)) {
