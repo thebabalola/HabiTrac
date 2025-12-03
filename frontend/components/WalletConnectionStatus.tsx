@@ -3,6 +3,7 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useConnect } from 'wagmi';
 import { useMemo } from 'react';
+import { BaseError } from 'viem';
 
 export default function WalletConnectionStatus() {
   const { isConnected, address, isConnecting } = useAccount();
@@ -34,7 +35,7 @@ export default function WalletConnectionStatus() {
 
       {error && (
         <div className="rounded-lg bg-red-50 px-4 py-2 text-sm text-red-800 dark:bg-red-900/30 dark:text-red-200">
-          Connection failed: {error?.shortMessage ?? error?.message}
+          Connection failed: {error instanceof BaseError ? error.shortMessage : error.message}
         </div>
       )}
 
