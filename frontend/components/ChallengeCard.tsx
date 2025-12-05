@@ -3,9 +3,9 @@
 import { Challenge } from '@/types/challenge';
 
 interface ChallengeCardProps {
-  challenge: Challenge;
-  onJoin: (challengeId: string) => void;
-  isJoined?: boolean;
+  readonly challenge: Challenge;
+  readonly onJoin: (challengeId: string) => void;
+  readonly isJoined?: boolean;
 }
 
 export default function ChallengeCard({ challenge, onJoin, isJoined = false }: ChallengeCardProps) {
