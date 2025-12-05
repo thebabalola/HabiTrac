@@ -14,8 +14,8 @@ interface Habit {
 }
 
 interface HabitItemProps {
-  habit: Habit;
-  onUpdate?: () => void;
+  readonly habit: Habit;
+  readonly onUpdate?: () => void;
 }
 
 export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
