@@ -3,9 +3,9 @@
 import { Challenge } from '@/types/challenge';
 
 interface ChallengeCardProps {
-  challenge: Challenge;
-  onJoin: (challengeId: string) => void;
-  isJoined?: boolean;
+  readonly challenge: Challenge;
+  readonly onJoin: (challengeId: string) => void;
+  readonly isJoined?: boolean;
 }
 
 export default function ChallengeCard({ challenge, onJoin, isJoined = false }: ChallengeCardProps) {
@@ -14,7 +14,7 @@ export default function ChallengeCard({ challenge, onJoin, isJoined = false }: C
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-all duration-300 border border-gray-200 dark:border-gray-700 flex flex-col h-full">
       <div className="mb-4">
         <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-2">
           {challenge.name}
@@ -57,11 +57,11 @@ export default function ChallengeCard({ challenge, onJoin, isJoined = false }: C
           </div>
         )}
       </div>
-      <div className="flex items-center justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
+      <div className="mt-auto flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-2 border-t border-gray-200 dark:border-gray-700">
         <button
           onClick={() => onJoin(challenge.id)}
           disabled={isJoined}
-          className={`font-semibold py-2 px-4 rounded-lg transition-colors ${
+          className={`w-full sm:w-auto font-semibold py-2.5 px-4 rounded-lg transition-colors ${
             isJoined
               ? 'bg-gray-400 text-white cursor-not-allowed'
               : 'bg-blue-600 hover:bg-blue-700 text-white'

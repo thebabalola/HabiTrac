@@ -14,8 +14,8 @@ interface Habit {
 }
 
 interface HabitItemProps {
-  habit: Habit;
-  onUpdate?: () => void;
+  readonly habit: Habit;
+  readonly onUpdate?: () => void;
 }
 
 export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
@@ -42,7 +42,7 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
 
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
-      <div className="flex justify-between items-start mb-4">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-4">
         <div className="flex-1">
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
             {habit.name}
@@ -52,7 +52,7 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
               {habit.description}
             </p>
           )}
-          <div className="flex items-center space-x-4 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="text-gray-600 dark:text-gray-400">
               Streak: <span className="font-semibold text-orange-600 dark:text-orange-400">
                 {Number(streak || 0n)} days
@@ -65,7 +65,9 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
             </span>
           </div>
         </div>
-        <LogHabitButton habitId={habit.id} onSuccess={onUpdate} />
+        <div className="sm:flex-shrink-0 sm:pl-6 w-full sm:w-auto">
+          <LogHabitButton habitId={habit.id} onSuccess={onUpdate} />
+        </div>
       </div>
     </div>
   );
