@@ -37,7 +37,9 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
   };
 
   if (isSuccess && onSuccess) {
-    onSuccess();
+    setTimeout(() => {
+      onSuccess();
+    }, 1000);
   }
 
   const isLoading = isPending || isConfirming;
