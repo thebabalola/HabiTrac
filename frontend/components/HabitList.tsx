@@ -26,6 +26,10 @@ export default function HabitList() {
     watch: true,
   });
 
+  const handleHabitDeleted = () => {
+    refetch();
+  };
+
   if (!address) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
@@ -61,7 +65,7 @@ export default function HabitList() {
   return (
     <div className="space-y-4">
       {activeHabits.map((habit) => (
-        <HabitItem key={Number(habit.id)} habit={habit} onUpdate={() => refetch()} />
+        <HabitItem key={Number(habit.id)} habit={habit} onUpdate={handleHabitDeleted} />
       ))}
     </div>
   );
