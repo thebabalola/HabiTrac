@@ -49,11 +49,13 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
     onSuccess();
   }
 
+  const isLoading = isPending || isConfirming;
+
   return (
     <>
       <button
         onClick={handleOpenDialog}
-        disabled={!address}
+        disabled={isLoading || !address}
         className="bg-red-600 hover:bg-red-700 disabled:bg-gray-400 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
       >
         Delete Habit
@@ -80,19 +82,27 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
             <div className="flex gap-3 justify-end">
               <button
                 onClick={handleCloseDialog}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors"
+                disabled={isLoading}
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+                disabled={isLoading || !address}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                Delete
+                {isLoading ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {isSuccess && !showConfirmDialog && (
+        <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+          Habit deleted successfully
+        </p>
       )}
     </>
   );
