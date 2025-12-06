@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import HabiTracABI from '@/abis/HabiTrac.json';
 
@@ -11,13 +12,17 @@ interface DeleteHabitButtonProps {
 
 export default function DeleteHabitButton({ habitId, habitName, onSuccess }: DeleteHabitButtonProps) {
   const { address } = useAccount();
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 
   return (
-    <button
-      className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
-    >
-      Delete Habit
-    </button>
+    <>
+      <button
+        onClick={() => setShowConfirmDialog(true)}
+        className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-4 rounded-lg transition-colors text-sm"
+      >
+        Delete Habit
+      </button>
+    </>
   );
 }
