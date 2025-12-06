@@ -45,6 +45,10 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
     }
   };
 
+  if (isSuccess && onSuccess) {
+    onSuccess();
+  }
+
   return (
     <>
       <button
