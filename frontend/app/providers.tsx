@@ -6,6 +6,7 @@ import { configureChains, createConfig, WagmiConfig } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
 import { publicProvider } from 'wagmi/providers/public';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { TokenBalanceProvider } from '@/contexts/TokenBalanceContext';
 
 const { chains, publicClient } = configureChains(
   [base, baseSepolia],
@@ -34,7 +35,9 @@ export function Providers({ children }: { children: React.ReactNode }) {
     <WagmiConfig config={wagmiConfig}>
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider chains={chains}>
-          {children}
+          <TokenBalanceProvider>
+            {children}
+          </TokenBalanceProvider>
         </RainbowKitProvider>
       </QueryClientProvider>
     </WagmiConfig>
