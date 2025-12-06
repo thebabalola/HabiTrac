@@ -1,6 +1,7 @@
 'use client';
 
 import { useAccount, useContractRead } from 'wagmi';
+import { useRouter } from 'next/navigation';
 import HabiTracABI from '@/abis/HabiTrac.json';
 import LogHabitButton from './LogHabitButton';
 
@@ -20,6 +21,7 @@ interface HabitItemProps {
 
 export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
   const { address } = useAccount();
+  const router = useRouter();
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 
   const { data: streak } = useContractRead({
@@ -43,8 +45,8 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-4">
-        <div className="flex-1">
-          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+        <div className="flex-1 cursor-pointer" onClick={() => router.push(`/habits/${habit.id}`)}>
+          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 hover:text-blue-600 dark:hover:text-blue-400">
             {habit.name}
           </h3>
           {habit.description && (
