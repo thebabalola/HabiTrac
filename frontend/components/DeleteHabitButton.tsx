@@ -53,8 +53,8 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
       </button>
 
       {showConfirmDialog && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Delete Habit
             </h3>
@@ -70,18 +70,18 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
               </div>
             )}
 
-            <div className="flex gap-3 justify-end">
+            <div className="flex flex-col sm:flex-row gap-3 justify-end mt-6">
               <button
                 onClick={() => setShowConfirmDialog(false)}
                 disabled={isLoading}
-                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50"
+                className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-700 hover:bg-gray-300 dark:hover:bg-gray-600 rounded-lg transition-colors disabled:opacity-50 font-medium"
               >
                 Cancel
               </button>
               <button
                 onClick={handleDelete}
                 disabled={isLoading || !address}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed font-medium"
               >
                 {isLoading ? 'Deleting...' : 'Delete'}
               </button>
