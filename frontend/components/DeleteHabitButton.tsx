@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi';
 import HabiTracABI from '@/abis/HabiTrac.json';
+import { parseTransactionError } from '@/utils/parseTransactionError';
+import ErrorMessage from './ErrorMessage';
 
 interface DeleteHabitButtonProps {
   habitId: number;
@@ -21,7 +23,7 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
     functionName: 'deleteHabit',
   });
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransaction({
+  const { isLoading: isConfirming, isSuccess, error: waitError } = useWaitForTransaction({
     hash: data?.hash,
   });
 
@@ -80,11 +82,12 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
               Are you sure? This action cannot be undone.
             </p>
             
-            {error && (
-              <div className="mb-4 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-                <p className="text-sm text-red-600 dark:text-red-400">
-                  {error.message}
-                </p>
+            {(error || waitError) && (
+              <div className="mb-4">
+                <ErrorMessage 
+                  error={parseTransactionError(error || waitError)} 
+                  onRetry={handleDelete}
+                />
               </div>
             )}
 

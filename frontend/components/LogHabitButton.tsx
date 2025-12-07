@@ -5,6 +5,8 @@ import { useAccount, useContractWrite, useWaitForTransaction } from 'wagmi';
 import HabiTracABI from '@/abis/HabiTrac.json';
 import { useTokenBalanceContext } from '@/contexts/TokenBalanceContext';
 import { useTokenEarnings } from '@/hooks/useTokenEarnings';
+import { parseTransactionError } from '@/utils/parseTransactionError';
+import ErrorMessage from './ErrorMessage';
 
 interface LogHabitButtonProps {
   habitId: number;
@@ -23,7 +25,7 @@ export default function LogHabitButton({ habitId, onSuccess }: LogHabitButtonPro
     functionName: 'logHabit',
   });
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransaction({
+  const { isLoading: isConfirming, isSuccess, error: waitError } = useWaitForTransaction({
     hash: data?.hash,
   });
 
@@ -64,10 +66,13 @@ export default function LogHabitButton({ habitId, onSuccess }: LogHabitButtonPro
         {isLoading ? 'Logging...' : 'Log Today'}
       </button>
       
-      {error && (
-        <p className="text-xs text-red-600 dark:text-red-400 max-w-[150px] text-right">
-          {error.message}
-        </p>
+      {(error || waitError) && (
+        <div className="max-w-[200px]">
+          <ErrorMessage 
+            error={parseTransactionError(error || waitError)} 
+            onRetry={handleLogHabit}
+          />
+        </div>
       )}
       
       {isSuccess && (
