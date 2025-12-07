@@ -24,7 +24,7 @@ export default function CreateHabitForm({ onSuccess }: CreateHabitFormProps) {
     functionName: 'createHabit',
   });
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransaction({
+  const { isLoading: isConfirming, isSuccess, error: waitError } = useWaitForTransaction({
     hash: data?.hash,
   });
 
@@ -100,9 +100,9 @@ export default function CreateHabitForm({ onSuccess }: CreateHabitFormProps) {
           </select>
         </div>
 
-        {error && (
+        {(error || waitError) && (
           <ErrorMessage 
-            error={parseTransactionError(error)} 
+            error={parseTransactionError(error || waitError)} 
             onRetry={handleSubmit}
           />
         )}

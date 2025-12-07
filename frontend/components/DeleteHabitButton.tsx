@@ -23,7 +23,7 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
     functionName: 'deleteHabit',
   });
 
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransaction({
+  const { isLoading: isConfirming, isSuccess, error: waitError } = useWaitForTransaction({
     hash: data?.hash,
   });
 
@@ -82,10 +82,10 @@ export default function DeleteHabitButton({ habitId, habitName, onSuccess }: Del
               Are you sure? This action cannot be undone.
             </p>
             
-            {error && (
+            {(error || waitError) && (
               <div className="mb-4">
                 <ErrorMessage 
-                  error={parseTransactionError(error)} 
+                  error={parseTransactionError(error || waitError)} 
                   onRetry={handleDelete}
                 />
               </div>
