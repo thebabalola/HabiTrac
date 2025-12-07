@@ -26,10 +26,11 @@ export function parseTransactionError(error: any): ParsedError {
     errorCode === 4001 ||
     errorCode === 'ACTION_REJECTED' ||
     errorMessage.toLowerCase().includes('user rejected') ||
-    errorMessage.toLowerCase().includes('user denied')
+    errorMessage.toLowerCase().includes('user denied') ||
+    errorMessage.toLowerCase().includes('rejected the request')
   ) {
     return {
-      message: 'Transaction was cancelled. Please try again when ready.',
+      message: 'Transaction was cancelled. You can try again when ready.',
       type: 'user_rejection',
       actionable: true,
       actionText: 'Try Again',
