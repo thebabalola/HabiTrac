@@ -76,14 +76,29 @@ export function parseTransactionError(error: any): ParsedError {
   // Contract revert errors
   if (
     errorMessage.toLowerCase().includes('revert') ||
-    errorMessage.toLowerCase().includes('execution reverted')
+    errorMessage.toLowerCase().includes('execution reverted') ||
+    errorMessage.toLowerCase().includes('habit does not exist') ||
+    errorMessage.toLowerCase().includes('not the habit owner') ||
+    errorMessage.toLowerCase().includes('habit already logged')
   ) {
     // Try to extract the revert reason
-    const revertMatch = errorMessage.match(/revert\s+(.+)/i);
-    const revertReason = revertMatch ? revertMatch[1] : 'Transaction failed';
+    let userMessage = 'Transaction failed';
+    
+    if (errorMessage.toLowerCase().includes('habit does not exist')) {
+      userMessage = 'This habit does not exist. Please refresh the page.';
+    } else if (errorMessage.toLowerCase().includes('not the habit owner')) {
+      userMessage = 'You are not the owner of this habit.';
+    } else if (errorMessage.toLowerCase().includes('habit already logged')) {
+      userMessage = 'This habit has already been logged for today.';
+    } else {
+      const revertMatch = errorMessage.match(/revert\s+(.+)/i) || errorMessage.match(/reason:\s*(.+)/i);
+      if (revertMatch) {
+        userMessage = `Transaction failed: ${revertMatch[1]}`;
+      }
+    }
     
     return {
-      message: `Transaction failed: ${revertReason}`,
+      message: userMessage,
       type: 'contract_error',
       actionable: false,
     };
