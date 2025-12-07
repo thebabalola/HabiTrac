@@ -40,12 +40,15 @@ export function parseTransactionError(error: any): ParsedError {
   // Insufficient gas
   if (
     errorCode === -32000 ||
+    errorCode === -32603 ||
     errorMessage.toLowerCase().includes('insufficient funds') ||
-    errorMessage.toLowerCase().includes('gas') ||
-    errorMessage.toLowerCase().includes('out of gas')
+    errorMessage.toLowerCase().includes('insufficient balance') ||
+    errorMessage.toLowerCase().includes('gas required exceeds') ||
+    errorMessage.toLowerCase().includes('out of gas') ||
+    errorMessage.toLowerCase().includes('gas price too low')
   ) {
     return {
-      message: 'Insufficient gas to complete transaction. Please add more ETH to your wallet.',
+      message: 'Insufficient gas to complete transaction. Please add more ETH to your wallet or increase gas limit.',
       type: 'insufficient_gas',
       actionable: true,
       actionText: 'Add Funds',
