@@ -29,12 +29,21 @@ contract HabiTrac is Ownable {
 
     uint256 public habitCounter;
     address[] public users;
+    IERC20 public rewardToken;
+    
+    // Reward configuration
+    uint256 public constant BASE_REWARD = 1e18; // 1 token per log (with 18 decimals)
+    uint256 public constant STREAK_BONUS_DIVISOR = 7; // Bonus every 7 days
 
     event HabitCreated(address indexed user, uint256 indexed habitId, string name);
     event HabitLogged(address indexed user, uint256 indexed habitId, uint256 timestamp);
     event HabitDeleted(address indexed user, uint256 indexed habitId);
+    event RewardClaimed(address indexed user, uint256 indexed habitId, uint256 amount);
 
-    constructor() Ownable(msg.sender) {}
+    constructor(address _rewardToken) Ownable(msg.sender) {
+        require(_rewardToken != address(0), "Token address cannot be zero");
+        rewardToken = IERC20(_rewardToken);
+    }
 
     function createHabit(
         string memory _name,
