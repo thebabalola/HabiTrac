@@ -202,5 +202,25 @@ contract HabiTrac is Ownable {
     function getTotalLoggedDays(address _user, uint256 _habitId) public view returns (uint256) {
         return totalLoggedDays[_user][_habitId];
     }
+
+    function getRewardBalance(address _user) public view returns (uint256) {
+        if (address(rewardToken) == address(0)) {
+            return 0;
+        }
+        return rewardToken.balanceOf(_user);
+    }
+    
+    function calculateNextReward(address _user, uint256 _habitId) public view returns (uint256) {
+        uint256 currentStreak = habitStreaks[_user][_habitId];
+        uint256 nextStreak = currentStreak + 1;
+        uint256 reward = BASE_REWARD;
+        
+        // Bonus for maintaining streaks (extra token every 7 days)
+        if (nextStreak > 0 && nextStreak % STREAK_BONUS_DIVISOR == 0) {
+            reward += BASE_REWARD; // Double reward on streak milestones
+        }
+        
+        return reward;
+    }
 }
 
