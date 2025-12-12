@@ -120,6 +120,33 @@ describe("HabiTrac - Streak Calculation Tests", function () {
         habiTrac.connect(user1).logHabit(habitId, currentTime)
       ).to.be.revertedWith("Habit already logged for this day");
     });
+
+    it("Should correctly calculate streak when logging past days", async function () {
+      const tx = await habiTrac.connect(user1).createHabit("Test Habit", "Test Description");
+      const receipt = await tx.wait();
+      const event = receipt.logs.find(log => {
+        try {
+          return habiTrac.interface.parseLog(log).name === "HabitCreated";
+        } catch {
+          return false;
+        }
+      });
+      const habitId = habiTrac.interface.parseLog(event).args.habitId;
+      
+      const baseTime = Math.floor(Date.now() / 1000);
+      const oneDay = 86400;
+      
+      // Log for 3 consecutive days in past
+      await habiTrac.connect(user1).logHabit(habitId, baseTime - (oneDay * 3));
+      await habiTrac.connect(user1).logHabit(habitId, baseTime - (oneDay * 2));
+      await habiTrac.connect(user1).logHabit(habitId, baseTime - oneDay);
+      
+      // Log current day
+      await habiTrac.connect(user1).logHabit(habitId, baseTime);
+      
+      const streak = await habiTrac.getHabitStreak(user1.address, habitId);
+      expect(streak).to.equal(4); // Should count all 4 consecutive days
+    });
   });
 });
 
