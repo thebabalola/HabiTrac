@@ -99,6 +99,27 @@ describe("HabiTrac - Streak Calculation Tests", function () {
       const streak = await habiTrac.getHabitStreak(user1.address, habitId);
       expect(streak).to.equal(1); // Should reset to 1 after gap
     });
+
+    it("Should prevent logging the same habit twice on the same day", async function () {
+      const tx = await habiTrac.connect(user1).createHabit("Test Habit", "Test Description");
+      const receipt = await tx.wait();
+      const event = receipt.logs.find(log => {
+        try {
+          return habiTrac.interface.parseLog(log).name === "HabitCreated";
+        } catch {
+          return false;
+        }
+      });
+      const habitId = habiTrac.interface.parseLog(event).args.habitId;
+      
+      const currentTime = Math.floor(Date.now() / 1000);
+      await habiTrac.connect(user1).logHabit(habitId, currentTime);
+      
+      // Try to log again on the same day - should fail
+      await expect(
+        habiTrac.connect(user1).logHabit(habitId, currentTime)
+      ).to.be.revertedWith("Habit already logged for this day");
+    });
   });
 });
 
