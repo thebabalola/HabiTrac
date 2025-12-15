@@ -1,15 +1,16 @@
-'use client';
+"use client";
 
-import { useParams, useRouter } from 'next/navigation';
-import { useAccount, useContractRead } from 'wagmi';
-import HabiTracABI from '@/abis/HabiTrac.json';
-import Navigation from '@/components/Navigation';
-import DeleteHabitButton from '@/components/DeleteHabitButton';
+import { useParams, useRouter } from "next/navigation";
+import { useAccount, useContractRead } from "wagmi";
+import HabiTracABI from "@/abis/HabiTrac.json";
+import Navigation from "@/components/Navigation";
+import DeleteHabitButton from "@/components/DeleteHabitButton";
 
 interface Habit {
   id: number;
   name: string;
   description: string;
+  frequency: string;
   owner: string;
   createdAt: bigint;
   isActive: boolean;
@@ -20,26 +21,30 @@ export default function HabitDetailPage() {
   const router = useRouter();
   const habitId = Number(params.id);
   const { address } = useAccount();
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+  const contractAddress =
+    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+    "0x0000000000000000000000000000000000000000";
 
   const { data: userHabits } = useContractRead({
     address: contractAddress as `0x${string}`,
     abi: HabiTracABI,
-    functionName: 'getUserHabits',
+    functionName: "getUserHabits",
     args: address ? [address] : undefined,
     enabled: !!address,
     watch: true,
   });
 
   const habits = (userHabits as Habit[]) || [];
-  const habit = habits.find(h => Number(h.id) === habitId);
+  const habit = habits.find((h) => Number(h.id) === habitId);
 
   if (!address) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
         <Navigation />
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-          <p className="text-gray-600 dark:text-gray-300">Please connect your wallet</p>
+          <p className="text-gray-600 dark:text-gray-300">
+            Please connect your wallet
+          </p>
         </main>
       </div>
     );
@@ -61,7 +66,7 @@ export default function HabitDetailPage() {
       <Navigation />
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
         <button
-          onClick={() => router.push('/dashboard')}
+          onClick={() => router.push("/dashboard")}
           className="mb-4 text-blue-600 dark:text-blue-400 hover:underline"
         >
           Back to Dashboard
@@ -75,11 +80,21 @@ export default function HabitDetailPage() {
               {habit.description}
             </p>
           )}
+          {habit.frequency && (
+            <div className="mb-6">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                Frequency:{" "}
+              </span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 capitalize">
+                {habit.frequency}
+              </span>
+            </div>
+          )}
           <div className="mt-6">
-            <DeleteHabitButton 
-              habitId={habit.id} 
+            <DeleteHabitButton
+              habitId={habit.id}
               habitName={habit.name}
-              onSuccess={() => router.push('/dashboard')}
+              onSuccess={() => router.push("/dashboard")}
             />
           </div>
         </div>

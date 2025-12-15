@@ -8,6 +8,7 @@ interface Habit {
   id: number;
   name: string;
   description: string;
+  frequency: string;
   owner: string;
   createdAt: bigint;
   isActive: boolean;

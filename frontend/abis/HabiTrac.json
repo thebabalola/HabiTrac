@@ -103,6 +103,11 @@
         "internalType": "string",
         "name": "_description",
         "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_frequency",
+        "type": "string"
       }
     ],
     "name": "createHabit",
@@ -329,6 +334,11 @@
             "type": "string"
           },
           {
+            "internalType": "string",
+            "name": "frequency",
+            "type": "string"
+          },
+          {
             "internalType": "address",
             "name": "owner",
             "type": "address"
@@ -383,6 +393,11 @@
         "type": "string"
       },
       {
+        "internalType": "string",
+        "name": "frequency",
+        "type": "string"
+      },
+      {
         "internalType": "address",
         "name": "owner",
         "type": "address"
@@ -402,4 +417,3 @@
     "type": "function"
   }
 ]
-
