@@ -8,6 +8,7 @@ contract HabiTrac is Ownable {
         uint256 id;
         string name;
         string description;
+        string frequency;
         address owner;
         uint256 createdAt;
         bool isActive;
@@ -28,23 +29,33 @@ contract HabiTrac is Ownable {
     uint256 public habitCounter;
     address[] public users;
 
-    event HabitCreated(address indexed user, uint256 indexed habitId, string name);
-    event HabitLogged(address indexed user, uint256 indexed habitId, uint256 timestamp);
+    event HabitCreated(
+        address indexed user,
+        uint256 indexed habitId,
+        string name
+    );
+    event HabitLogged(
+        address indexed user,
+        uint256 indexed habitId,
+        uint256 timestamp
+    );
     event HabitDeleted(address indexed user, uint256 indexed habitId);
 
     constructor() Ownable(msg.sender) {}
 
     function createHabit(
         string memory _name,
-        string memory _description
+        string memory _description,
+        string memory _frequency
     ) public returns (uint256) {
         require(bytes(_name).length > 0, "Habit name cannot be empty");
-        
+
         uint256 habitId = habitCounter++;
         Habit memory newHabit = Habit({
             id: habitId,
             name: _name,
             description: _description,
+            frequency: _frequency,
             owner: msg.sender,
             createdAt: block.timestamp,
             isActive: true
@@ -52,7 +63,7 @@ contract HabiTrac is Ownable {
 
         userHabits[msg.sender].push(newHabit);
         habitOwners[habitId] = msg.sender;
-        
+
         // Track unique users
         if (userHabits[msg.sender].length == 1) {
             users.push(msg.sender);
@@ -65,7 +76,7 @@ contract HabiTrac is Ownable {
     function logHabit(uint256 _habitId, uint256 _timestamp) public {
         require(_habitId < habitCounter, "Habit does not exist");
         require(habitOwners[_habitId] == msg.sender, "Not the habit owner");
-        
+
         // Find the habit in user's habits array
         Habit[] storage habits = userHabits[msg.sender];
         bool found = false;
@@ -83,7 +94,7 @@ contract HabiTrac is Ownable {
         // Check if already logged for this day
         uint256 dayStart = (_timestamp / 86400) * 86400; // Start of day in seconds
         HabitLog[] storage logs = habitLogs[msg.sender][_habitId];
-        
+
         bool alreadyLogged = false;
         for (uint256 i = 0; i < logs.length; i++) {
             uint256 logDayStart = (logs[i].timestamp / 86400) * 86400;
@@ -110,7 +121,11 @@ contract HabiTrac is Ownable {
         emit HabitLogged(msg.sender, _habitId, _timestamp);
     }
 
-    function _updateStreak(address _user, uint256 _habitId, uint256 _timestamp) internal {
+    function _updateStreak(
+        address _user,
+        uint256 _habitId,
+        uint256 _timestamp
+    ) internal {
         HabitLog[] storage logs = habitLogs[_user][_habitId];
         if (logs.length == 0) {
             habitStreaks[_user][_habitId] = 0;
@@ -138,7 +153,7 @@ contract HabiTrac is Ownable {
     function deleteHabit(uint256 _habitId) public {
         require(_habitId < habitCounter, "Habit does not exist");
         require(habitOwners[_habitId] == msg.sender, "Not the habit owner");
-        
+
         // Find and deactivate the habit
         Habit[] storage habits = userHabits[msg.sender];
         for (uint256 i = 0; i < habits.length; i++) {
@@ -147,7 +162,7 @@ contract HabiTrac is Ownable {
                 break;
             }
         }
-        
+
         emit HabitDeleted(msg.sender, _habitId);
     }
 
@@ -155,16 +170,24 @@ contract HabiTrac is Ownable {
         return userHabits[_user];
     }
 
-    function getHabitLogs(address _user, uint256 _habitId) public view returns (HabitLog[] memory) {
+    function getHabitLogs(
+        address _user,
+        uint256 _habitId
+    ) public view returns (HabitLog[] memory) {
         return habitLogs[_user][_habitId];
     }
 
-    function getHabitStreak(address _user, uint256 _habitId) public view returns (uint256) {
+    function getHabitStreak(
+        address _user,
+        uint256 _habitId
+    ) public view returns (uint256) {
         return habitStreaks[_user][_habitId];
     }
 
-    function getTotalLoggedDays(address _user, uint256 _habitId) public view returns (uint256) {
+    function getTotalLoggedDays(
+        address _user,
+        uint256 _habitId
+    ) public view returns (uint256) {
         return totalLoggedDays[_user][_habitId];
     }
 }
-
