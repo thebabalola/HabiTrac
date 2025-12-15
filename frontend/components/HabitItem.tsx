@@ -1,14 +1,15 @@
-'use client';
+"use client";
 
-import { useAccount, useContractRead } from 'wagmi';
-import { useRouter } from 'next/navigation';
-import HabiTracABI from '@/abis/HabiTrac.json';
-import LogHabitButton from './LogHabitButton';
+import { useAccount, useContractRead } from "wagmi";
+import { useRouter } from "next/navigation";
+import HabiTracABI from "@/abis/HabiTrac.json";
+import LogHabitButton from "./LogHabitButton";
 
 interface Habit {
   id: number;
   name: string;
   description: string;
+  frequency: string;
   owner: string;
   createdAt: bigint;
   isActive: boolean;
@@ -22,12 +23,14 @@ interface HabitItemProps {
 export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
   const { address } = useAccount();
   const router = useRouter();
-  const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+  const contractAddress =
+    process.env.NEXT_PUBLIC_CONTRACT_ADDRESS ||
+    "0x0000000000000000000000000000000000000000";
 
   const { data: streak } = useContractRead({
     address: contractAddress as `0x${string}`,
     abi: HabiTracABI,
-    functionName: 'getHabitStreak',
+    functionName: "getHabitStreak",
     args: address ? [address, BigInt(habit.id)] : undefined,
     enabled: !!address,
     watch: true,
@@ -36,7 +39,7 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
   const { data: totalDays } = useContractRead({
     address: contractAddress as `0x${string}`,
     abi: HabiTracABI,
-    functionName: 'getTotalLoggedDays',
+    functionName: "getTotalLoggedDays",
     args: address ? [address, BigInt(habit.id)] : undefined,
     enabled: !!address,
     watch: true,
@@ -45,7 +48,10 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-4">
-        <div className="flex-1 cursor-pointer" onClick={() => router.push(`/habits/${habit.id}`)}>
+        <div
+          className="flex-1 cursor-pointer"
+          onClick={() => router.push(`/habits/${habit.id}`)}
+        >
           <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 hover:text-blue-600 dark:hover:text-blue-400">
             {habit.name}
           </h3>
@@ -54,14 +60,23 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
               {habit.description}
             </p>
           )}
+          {habit.frequency && (
+            <div className="mb-3">
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 capitalize">
+                {habit.frequency}
+              </span>
+            </div>
+          )}
           <div className="flex flex-wrap items-center gap-2 text-sm">
             <span className="text-gray-600 dark:text-gray-400">
-              Streak: <span className="font-semibold text-orange-600 dark:text-orange-400">
+              Streak:{" "}
+              <span className="font-semibold text-orange-600 dark:text-orange-400">
                 {Number(streak || 0n)} days
               </span>
             </span>
             <span className="text-gray-600 dark:text-gray-400">
-              Total: <span className="font-semibold text-blue-600 dark:text-blue-400">
+              Total:{" "}
+              <span className="font-semibold text-blue-600 dark:text-blue-400">
                 {Number(totalDays || 0n)} days
               </span>
             </span>
