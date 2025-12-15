@@ -45,7 +45,7 @@ export default function Dashboard() {
           </div>
         )}
 
-        <HabitList />
+        <HabitList onCreateFirstHabit={() => setShowCreateForm(true)} />
       </main>
     </div>
   );

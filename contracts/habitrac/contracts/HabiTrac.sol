@@ -2,6 +2,8 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 
 contract HabiTrac is Ownable {
     struct Habit {
@@ -28,6 +30,11 @@ contract HabiTrac is Ownable {
 
     uint256 public habitCounter;
     address[] public users;
+    IERC20 public rewardToken;
+    
+    // Reward configuration
+    uint256 public constant BASE_REWARD = 1e18; // 1 token per log (with 18 decimals)
+    uint256 public constant STREAK_BONUS_DIVISOR = 7; // Bonus every 7 days
 
     event HabitCreated(
         address indexed user,
@@ -40,8 +47,12 @@ contract HabiTrac is Ownable {
         uint256 timestamp
     );
     event HabitDeleted(address indexed user, uint256 indexed habitId);
+    event RewardClaimed(address indexed user, uint256 indexed habitId, uint256 amount);
 
-    constructor() Ownable(msg.sender) {}
+    constructor(address _rewardToken) Ownable(msg.sender) {
+        require(_rewardToken != address(0), "Token address cannot be zero");
+        rewardToken = IERC20(_rewardToken);
+    }
 
     function createHabit(
         string memory _name,
@@ -118,7 +129,38 @@ contract HabiTrac is Ownable {
         // Update streak
         _updateStreak(msg.sender, _habitId, _timestamp);
 
+        // Award tokens based on streak
+        uint256 rewardAmount = _calculateReward(msg.sender, _habitId);
+        _distributeReward(msg.sender, rewardAmount);
+
         emit HabitLogged(msg.sender, _habitId, _timestamp);
+        emit RewardClaimed(msg.sender, _habitId, rewardAmount);
+    }
+    
+    function _distributeReward(address _user, uint256 _amount) internal {
+        if (_amount > 0 && address(rewardToken) != address(0)) {
+            // Mint tokens directly to user
+            // Requires HabiTrac contract to be set as minter in token contract
+            (bool success, ) = address(rewardToken).call(
+                abi.encodeWithSignature("mint(address,uint256)", _user, _amount)
+            );
+            if (!success) {
+                // Fallback to transfer if minting not available
+                SafeERC20.safeTransfer(rewardToken, _user, _amount);
+            }
+        }
+    }
+
+    function _calculateReward(address _user, uint256 _habitId) internal view returns (uint256) {
+        uint256 streak = habitStreaks[_user][_habitId];
+        uint256 reward = BASE_REWARD; // Base reward for logging
+        
+        // Bonus for maintaining streaks (extra token every 7 days)
+        if (streak > 0 && streak % STREAK_BONUS_DIVISOR == 0) {
+            reward += BASE_REWARD; // Double reward on streak milestones
+        }
+        
+        return reward;
     }
 
     function _updateStreak(
@@ -189,5 +231,25 @@ contract HabiTrac is Ownable {
         uint256 _habitId
     ) public view returns (uint256) {
         return totalLoggedDays[_user][_habitId];
+    }
+
+    function getRewardBalance(address _user) public view returns (uint256) {
+        if (address(rewardToken) == address(0)) {
+            return 0;
+        }
+        return rewardToken.balanceOf(_user);
+    }
+    
+    function calculateNextReward(address _user, uint256 _habitId) public view returns (uint256) {
+        uint256 currentStreak = habitStreaks[_user][_habitId];
+        uint256 nextStreak = currentStreak + 1;
+        uint256 reward = BASE_REWARD;
+        
+        // Bonus for maintaining streaks (extra token every 7 days)
+        if (nextStreak > 0 && nextStreak % STREAK_BONUS_DIVISOR == 0) {
+            reward += BASE_REWARD; // Double reward on streak milestones
+        }
+        
+        return reward;
     }
 }

@@ -14,7 +14,11 @@ interface Habit {
   isActive: boolean;
 }
 
-export default function HabitList() {
+interface HabitListProps {
+  readonly onCreateFirstHabit?: () => void;
+}
+
+export default function HabitList({ onCreateFirstHabit }: HabitListProps) {
   const { address } = useAccount();
   const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
 
@@ -44,9 +48,20 @@ export default function HabitList() {
   if (!userHabits || (userHabits as Habit[]).length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+          No habits yet
+        </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          You don't have any habits yet. Create your first habit to get started!
+          Start by creating your first habit. Track your progress and earn rewards as you stay consistent.
         </p>
+        <button
+          type="button"
+          onClick={onCreateFirstHabit}
+          disabled={!onCreateFirstHabit}
+          className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          Create Your First Habit
+        </button>
       </div>
     );
   }
@@ -56,9 +71,20 @@ export default function HabitList() {
   if (activeHabits.length === 0) {
     return (
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8 text-center">
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-white mb-2">
+          No active habits
+        </h2>
         <p className="text-gray-600 dark:text-gray-300 mb-4">
-          You don't have any active habits. Create your first habit to get started!
+          Reactivate a habit or create a new one to begin tracking your progress and building streaks.
         </p>
+        <button
+          type="button"
+          onClick={onCreateFirstHabit}
+          disabled={!onCreateFirstHabit}
+          className="inline-flex items-center justify-center rounded-lg bg-blue-600 px-5 py-3 text-sm font-semibold text-white shadow-sm hover:bg-blue-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+        >
+          Create Your First Habit
+        </button>
       </div>
     );
   }

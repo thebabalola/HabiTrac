@@ -45,6 +45,13 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
     watch: true,
   });
 
+  const streakDays = Number(streak || 0n);
+
+  const milestones = [7, 30];
+  const nextFixedMilestone = milestones.find((m) => streakDays < m);
+  const nextMilestone = nextFixedMilestone ?? streakDays + 7;
+  const progress = Math.max(0, Math.min(1, streakDays / nextMilestone));
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between mb-4">
@@ -60,18 +67,10 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
               {habit.description}
             </p>
           )}
-          {habit.frequency && (
-            <div className="mb-3">
-              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200 capitalize">
-                {habit.frequency}
-              </span>
-            </div>
-          )}
-          <div className="flex flex-wrap items-center gap-2 text-sm">
+          <div className="flex flex-wrap items-center gap-2 text-sm mb-3">
             <span className="text-gray-600 dark:text-gray-400">
-              Streak:{" "}
-              <span className="font-semibold text-orange-600 dark:text-orange-400">
-                {Number(streak || 0n)} days
+              Streak: <span className="font-semibold text-orange-600 dark:text-orange-400">
+                {streakDays} days
               </span>
             </span>
             <span className="text-gray-600 dark:text-gray-400">
@@ -80,6 +79,22 @@ export default function HabitItem({ habit, onUpdate }: HabitItemProps) {
                 {Number(totalDays || 0n)} days
               </span>
             </span>
+          </div>
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+              <span>
+                Progress to next milestone ({nextMilestone} days)
+              </span>
+              <span className="font-medium text-gray-700 dark:text-gray-200">
+                {Math.round(progress * 100)}%
+              </span>
+            </div>
+            <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden">
+              <div
+                className="h-full rounded-full bg-gradient-to-r from-orange-400 to-orange-600 transition-[width] duration-500 ease-out"
+                style={{ width: `${progress * 100}%` }}
+              />
+            </div>
           </div>
         </div>
         <div className="sm:flex-shrink-0 sm:pl-6 w-full sm:w-auto">
